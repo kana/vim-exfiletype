@@ -1,0 +1,161 @@
+*exfiletype.txt*	:filetype wrapper for reliable configuration
+
+Version 0.0.0
+Script ID: ****
+Copyright (C) 2010 kana <http://whileimautomaton.net/>
+License: MIT license  {{{
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+CONTENTS					*exfiletype-contents*
+
+Introduction            |exfiletype-introduction|
+Interface               |exfiletype-interface|
+  Events                  |exfiletype-events|
+  Functions               |exfiletype-functions|
+Examples                |exfiletype-examples|
+Bugs                    |exfiletype-bugs|
+Changelog               |exfiletype-changelog|
+
+
+
+
+==============================================================================
+INTRODUCTION					*exfiletype-introduction*
+
+*exfiletype* is a Vim plugin to provide reliable way to do advanced
+per-|filetype| configuration.  Sometimes it's necessary to do some
+configuration before/after loading usual filetype plugins, and there is no way
+other than using |FileType| event to implement such configuration.  But it's
+troublesome because it requires circumspection on the order of autocommands.
+This plugin abstracts the details and provides reliable way to do such
+configuration.
+
+To activate the effect of this plugin, replace use of |:filetype| (which must
+be in your |vimrc|) with |exfiletype#configure()| as follows:
+>
+	" Before
+	filetype plugin indent on
+
+	" After
+	call exfiletype#configure('plugin indent on')
+<
+
+
+Requirements:
+- Vim 7.2 or later
+
+Latest version:
+http://github.com/kana/vim-exfiletype
+
+Document in HTML format:
+http://kana.github.com/config/vim/exfiletype.html
+
+
+
+
+==============================================================================
+INTERFACE					*exfiletype-interface*
+
+------------------------------------------------------------------------------
+EVENTS						*exfiletype-events*
+
+User FileTypeEnter:{filetype}			*FileTypeEnter*
+			This event will be triggered before loading all
+			filetype plugins for {filetype}.
+
+			For example, when you start to edit a C source code,
+			the following events will be triggered:
+
+			1. User FileTypeEnter:c
+			2. FileType c
+			3. User FileTypeLeave:c
+
+User FileTypeLeave:{filetype}			*FileTypeLeave*
+			Like |FileTypeEnter|, but this event will be triggered
+			after loading all filetype plugins for {filetype}.
+
+------------------------------------------------------------------------------
+FUNCTIONS					*exfiletype-functions*
+
+exfiletype#configure(argument)			*exfiletype#configure()*
+			Wrapper function for |:filetype| to provide
+			|exfiletype-events|.  From the user's point of view,
+>
+			:call exfiletype#configure('...')
+<
+			is essentially the same as the following command:
+>
+			:filetype ...
+<
+
+
+
+
+==============================================================================
+EXAMPLES					*exfiletype-examples*
+
+(A) Make omni completion available for all filetypes:
+>
+	autocmd User FileTypeLeave:*
+	\ if &l:omnifunc == ''
+	\   setlocal omnifunc=syntaxcomplete#Complete
+	\ endif
+<
+
+(B) Configure a project-global indentation style (which is prior to the global
+configuration, and filetype plugins are prior to this configuration):
+>
+	autocmd User FileTypeEnter:*
+	\ if getcwd() == expand('~/working/some-project')
+	\   setlocal noexpandtab tabstop=2 softtabstop=2 shiftwidth=2
+	\ endif
+<
+
+
+
+
+==============================================================================
+BUGS						*exfiletype-bugs*
+
+(A) |exfiletype#configure()| doesn't support all usage of |:filetype| yet.
+Only the following cases are supported at the moment:
+>
+	:filetype plugin indent on
+	:filetype detect
+<
+
+(B) Compound 'filetype' (multiple filetype names joined with dots such as
+"c.doxygen") is not supported yet.
+
+
+
+
+==============================================================================
+CHANGELOG					*exfiletype-changelog*
+
+0.0.0	2010-07-02T23:18:19+09:00		*exfiletype-changelog-0.0.0*
+	- Initial version.
+
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:fen:fdl=0:fdm=marker:
