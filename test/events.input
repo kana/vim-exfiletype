@@ -1,0 +1,41 @@
+silent call exfiletype#configure('plugin indent on')
+
+function s:describe__exfiletype__the_order_of_events_to_be_triggered()  "{{{1
+  " Set up.
+
+  tabnew
+
+  augroup test
+    autocmd User FileTypeEnter:c  call add(g:sketch, 'FileTypeEnter with c')
+    autocmd User FileTypeLeave:c  call add(g:sketch, 'FileTypeLeave with c')
+
+    autocmd User FileTypeEnter:sh  call add(g:sketch, 'FileTypeEnter with sh')
+    autocmd User FileTypeLeave:sh  call add(g:sketch, 'FileTypeLeave with sh')
+  augroup END
+
+  It should trigger FileType and other events with the proper order.
+
+  let g:sketch = []
+  Should g:sketch ==# []
+  setfiletype c
+  Should g:sketch ==# ['FileTypeEnter with c', 'FileTypeLeave with c']
+
+  let g:sketch = []
+  Should g:sketch ==# []
+  setfiletype sh
+  Should g:sketch ==# ['FileTypeEnter with sh', 'FileTypeLeave with sh']
+
+  " Tear down.
+
+  tabclose
+
+  augroup test
+    autocmd!
+  augroup END
+endfunction
+
+
+
+
+" __END__  "{{{1
+" vim: filetype=vim foldmethod=marker

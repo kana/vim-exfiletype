@@ -1,0 +1,10 @@
+==== exfiletype the order of events to be triggered
+---- It should trigger FileType and other events with the proper order. 
+....
+
+
+
+**** Result ****
+
+
+4 examples, 0 failures
