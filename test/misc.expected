@@ -1,0 +1,14 @@
+==== exfiletype trigger
+---- It should work with correct argument. 
+...
+---- It should work even if incorrect argument is given. 
+.
+---- It should work even if it is not called via :autocmd. 
+.
+
+
+
+**** Result ****
+
+
+5 examples, 0 failures

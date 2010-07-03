@@ -1,0 +1,46 @@
+function s:describe__exfiletype__trigger()  "{{{1
+  " Set up.
+
+  let g:sketch = []
+
+  augroup test
+    autocmd User enter nested  call exfiletype#_trigger('FileTypeEnter')
+    autocmd User leave nested  call exfiletype#_trigger('FileTypeLeave')
+    autocmd User other nested  call exfiletype#_trigger('Other')
+
+    autocmd User FileTypeEnter:enter  call add(g:sketch, 'enter!')
+    autocmd User FileTypeLeave:leave  call add(g:sketch, 'leave!')
+    autocmd User Other:other  call add(g:sketch, 'other!')
+    autocmd User WithoutAutocmd:  call add(g:sketch, 'without!')
+  augroup END
+
+  It should work with correct argument.
+
+  Should g:sketch ==# []
+  doautocmd User enter
+  Should g:sketch ==# ['enter!']
+  doautocmd User leave
+  Should g:sketch ==# ['enter!', 'leave!']
+
+  It should work even if incorrect argument is given.
+
+  doautocmd User other
+  Should g:sketch ==# ['enter!', 'leave!', 'other!']
+
+  It should work even if it is not called via :autocmd.
+
+  call exfiletype#_trigger('WithoutAutocmd')
+  Should g:sketch ==# ['enter!', 'leave!', 'other!', 'without!']
+
+  " Tear down.
+
+  augroup test
+    autocmd!
+  augroup END
+endfunction
+
+
+
+
+" __END__  "{{{1
+" vim: filetype=vim foldmethod=marker
